@@ -2,6 +2,46 @@
 
 미디어소프트웨어학과 20230990 박준서
 
+## 중간고사 정리 (2~7주차)
+
+2학기 전반부에는 스프링 부트 프로젝트 하나를 매주 키워 가며 포트폴리오 화면 → DB 연동 → 로그인 → 권한 → REST API까지 만들었습니다.
+
+### 시험공부 요약
+
+| 주차 | 핵심 개념 |
+|---|---|
+| 2주차 | 스프링 부트 = 자동 설정 + 내장 톰캣(8080). `@SpringBootApplication`, `@Controller` + `@GetMapping`이 뷰 이름을 반환하면 `templates/*.html`을 Thymeleaf가 렌더링(MVC). `th:text="${...}"`. templates 파일을 주소로 직접 열면 404 |
+| 3주차 | `templates`(컨트롤러 필요) / `static`(css·js·이미지) / `public`(정적 페이지) 구분. 경로는 `th:href="@{...}"`로 컨텍스트 경로 반영. 새 창 링크는 `rel="noopener noreferrer"` |
+| 4주차 | JPA = ORM 표준(구현체 하이버네이트), SQL 대신 메서드로 DB 제어. `@Entity` `@Id` `@GeneratedValue` `@Column`, `JpaRepository<엔티티, PK>`, `ddl-auto=update`. 계층 구조 Controller → Service → Repository → DB, `@Autowired`(DI), `th:each` |
+| 5주차 | 비밀번호는 BCrypt 단방향 해시(솔트 자동, 60자, `$2a$10$`). 시큐리티는 필터 체인으로 컨트롤러 전에 검사. `SecurityConfig`(permitAll · authenticated · formLogin · logout), `UserDetailsService.loadUserByUsername()`, CSRF와 `th:action`, DTO로 권한 조작 방지, `sec:authorize` |
+| 6주차 | 인증(누구인가) vs 인가(무엇을 할 수 있나). 접근 제어 3단계 : 화면 `sec:authorize` → URL `requestMatchers().hasRole()` → 메서드 `@PreAuthorize`(+`@EnableMethodSecurity`). 비로그인 302 / 권한 없음 403. `hasRole("ADMIN")` = `ROLE_ADMIN`. IDOR 방지(`Principal`), 세션 권한은 다시 로그인해야 갱신, PRG 패턴 |
+| 7주차 | `@RestController` = 객체 → JSON. 응답 DTO(record)로 비밀번호 노출 차단. 세션 쿠키(브라우저) vs Basic 인증(앱, Base64는 암호화 아님). REST = 주소는 대상, 메서드는 할 일(GET·POST·PATCH·DELETE). 상태 코드 200·201·204·400·401·403·404, `ResponseEntity`, `@RequestBody`·`@PathVariable`·`@RequestParam`, `@RestControllerAdvice` |
+
+### 그동안 해 온 것
+
+| 주차 | 결과물 |
+|---|---|
+| 2주차 | 개발환경 구성, `/hello`·`/hello2` 매핑과 Thymeleaf 출력 |
+| 3주차 | TemplateMo 포트폴리오 적용, 기술 영역 4개(웹·AI·보안·게임)와 상세 페이지 4개 |
+| 4주차 | MySQL 연동, 계층별 패키지 구조, 회원 목록(`/testdb`)과 나이·성별 컬럼 |
+| 5주차 | 회원가입·로그인·로그아웃, BCrypt 암호화, 로그인 상태 유지, 비밀번호 확인 |
+| 6주차 | USER·MANAGER·ADMIN 권한, 관리자 회원 관리, 403 화면, 관리자 본인 보호 |
+| 7주차 | 회원 관리 REST API, Postman 테스트, 회원 검색 API, 오류 처리 통합 |
+
+### 문제 해결 기록
+
+| 주차 | 문제 | 원인 → 해결 |
+|---|---|---|
+| 2주차 | 서버를 켜도 톰캣이 뜨지 않음 | `build.gradle`에 web·thymeleaf 의존성이 없었음 → `spring-boot-starter-web`, `-thymeleaf` 추가 |
+| 2주차 | 자바 코드의 한글이 깨짐 | Windows에서 컴파일러 기본 인코딩이 MS949 → `options.encoding = 'UTF-8'` |
+| 3주차 | 템플릿 폼 라벨 클릭이 안 먹음, 태그 하나가 남음 | 원본 템플릿 버그(`label for`와 `input id` 불일치, 여분의 `</div>`) → 직접 수정 |
+| 3주차 | 캐릭터 이미지에 흰 배경 사각형 | JPEG는 투명도가 없음 → 바깥 흰색만 투명하게 만든 PNG로 교체 |
+| 4~5주차 | DB 비밀번호가 공개 저장소에 올라갈 위험 | 계정 정보를 `application-secret.properties`로 분리하고 `.gitignore` 처리, 커밋 전 이력 검사 |
+| 5주차 | 테스트 도구로 한글 이름을 보내면 400 | 테스트 도구가 한글을 CP949로 보냄(앱 문제 아님) → UTF-8로 인코딩해서 전송 |
+| 6주차 | 제공 코드를 복사하다 꾸민 index.html이 덮어써짐 | Git 이전 커밋에서 복구한 뒤 교체부분(①~③)만 반영 |
+| 6주차 | 403 확인 시 화면 대신 JSON이 옴 | 요청의 `Accept` 헤더 차이(브라우저는 `error/403.html`) → HTML 요청으로 다시 확인 |
+| 7주차 | 깨진 JSON을 보내면 오류 응답에 서버 내부 정보(trace) 노출 | `@RestControllerAdvice`에서 JSON 파싱 오류도 메시지만 담은 400으로 처리 |
+
 ## 7주차 - 회원 관리 REST API(JSON) 완료
 
 지난주 회원 관리 기능을 JSON API로 다시 만들고, Postman(Basic 인증)과 화면(fetch + 세션 쿠키) 두 방식으로 같은 API를 호출합니다.
